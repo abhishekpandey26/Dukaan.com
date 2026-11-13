@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/YOUR_GITHUB_USERNAME/gocommerce-backend:latest # CI/CD updates this tag
+          image: ghcr.io/abhishekpandey26/gocommerce-backend:9e089049e9a74b033c35bfbb732365abb7d27647 # CI/CD updates this tag
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

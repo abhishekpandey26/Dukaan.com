@@ -1,0 +1,40 @@
+# Go API
+# replicas: 2 -> Kubernetes runs 2 copies and the Service splits traffic between them
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: ghcr.io/YOUR_GITHUB_USERNAME/gocommerce-backend:latest # CI/CD updates this tag
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            # "postgres" and "redis" are the Service names from the other files
+            - name: DATABASE_URL
+              value: postgres://postgres:postgres@postgres:5432/gocommerce?sslmode=disable
+            - name: REDIS_ADDR
+              value: redis:6379
+            - name: JWT_SECRET
+              value: change-me-in-production
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend # the frontend's nginx sends /api requests to "backend:8080"
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 8080

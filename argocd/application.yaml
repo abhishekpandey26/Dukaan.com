@@ -1,0 +1,25 @@
+# ArgoCD Application: "keep the cluster in sync with the k8s/ folder of this repo"
+#
+# Apply it once:   kubectl apply -f argocd/application.yaml
+# After that, every commit that changes k8s/ (e.g. the new image tag from
+# GitHub Actions) is deployed automatically.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gocommerce
+  namespace: argocd # where ArgoCD itself is installed
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_GITHUB_USERNAME/gocommerce.git # <- change this
+    targetRevision: main
+    path: k8s # the folder ArgoCD watches
+  destination:
+    server: https://kubernetes.default.svc # the same cluster ArgoCD runs in
+    namespace: gocommerce
+  syncPolicy:
+    automated:
+      prune: true # delete things you remove from k8s/
+      selfHeal: true # undo manual changes made with kubectl
+    syncOptions:
+      - CreateNamespace=true # create the "gocommerce" namespace if missing
